@@ -1,0 +1,9 @@
+{
+  "name": "clinical-case-builder",
+  "version": "1.0.0",
+  "description": "AI-assisted clinical reasoning report builder",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}

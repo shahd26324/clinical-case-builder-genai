@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Clinical Case Builder</title>
+<style>
+  :root {
+    --bg: #f8f9fb;
+    --surface: #ffffff;
+    --border: #e2e6ea;
+    --text: #1a2230;
+    --muted: #6b7a90;
+    --accent: #1d6fa4;
+    --accent-light: #e6f1fb;
+    --success: #1d9e75;
+    --success-light: #e1f5ee;
+    --warn: #ba7517;
+    --warn-light: #faeeda;
+    --danger: #a32d2d;
+    --danger-light: #fcebeb;
+    --radius: 10px;
+    --font: 'Georgia', serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .logo {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 18px; font-weight: bold; font-family: sans-serif;
+  }
+  header h1 { font-size: 1.15rem; font-weight: 600; font-family: sans-serif; }
+  header p { font-size: 0.8rem; color: var(--muted); font-family: sans-serif; margin-top: 2px; }
+  .disclaimer {
+    background: var(--warn-light);
+    border: 1px solid #f0c060;
+    border-radius: var(--radius);
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    color: var(--warn);
+    font-family: sans-serif;
+    margin: 1rem 2rem 0;
+  }
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    max-width: 1400px;
+  }
+  @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .panel-header {
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    font-family: sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  textarea {
+    width: 100%;
+    min-height: 260px;
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: vertical;
+    padding: 1rem 1.25rem;
+    font-family: var(--font);
+    font-size: 0.95rem;
+    color: var(--text);
+    background: transparent;
+    line-height: 1.7;
+  }
+  textarea::placeholder { color: var(--muted); }
+  .action-row {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 0.75rem; align-items: center; justify-content: flex-end;
+  }
+  .btn {
+    padding: 0.55rem 1.4rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { opacity: 0.88; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-sm {
+    padding: 0.35rem 0.9rem;
+    font-size: 0.78rem;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    font-family: sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-sm:hover { background: var(--accent-light); }
+  .report {
+    padding: 1.25rem;
+    min-height: 340px;
+    max-height: 70vh;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .report-placeholder {
+    color: var(--muted);
+    font-family: sans-serif;
+    font-size: 0.9rem;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 280px; gap: 0.75rem; text-align: center;
+  }
+  .report-placeholder svg { opacity: 0.3; }
+  .section-title {
+    font-family: sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 1.1rem 0 0.4rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title:first-child { margin-top: 0; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .tag {
+    font-family: sans-serif;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .tag-symptom { background: var(--accent-light); color: var(--accent); }
+  .tag-category { background: var(--warn-light); color: var(--warn); }
+  .tag-flag { background: var(--danger-light); color: var(--danger); }
+  .tag-pos { background: var(--success-light); color: var(--success); }
+  .report-text {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+    font-family: var(--font);
+  }
+  .loading-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 280px; gap: 0.75rem;
+  }
+  .loading-bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--success));
+    border-radius: 2px;
+    animation: slide 1.2s infinite;
+    width: 140px;
+  }
+  @keyframes slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+  .report-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 0.5rem;
+  }
+  .struct { display: grid; gap: 0.6rem; }
+  .struct-row {
+    display: flex; gap: 0.5rem; align-items: flex-start;
+    font-size: 0.88rem; line-height: 1.6;
+  }
+  .struct-label {
+    font-family: sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 110px;
+    padding-top: 2px;
+  }
+  .struct-val { color: var(--text); font-family: var(--font); }
+  #error-msg {
+    display: none;
+    background: var(--danger-light);
+    color: var(--danger);
+    border: 1px solid #f09595;
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    font-family: sans-serif;
+    font-size: 0.82rem;
+    margin: 0.5rem 1.25rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">C</div>
+  <div>
+    <h1>Clinical Case Builder</h1>
+    <p>Structured clinical reasoning reports · AI-assisted · Not a diagnostic tool</p>
+  </div>
+</header>
+
+<div class="disclaimer">
+  ⚠ This tool is for educational and organisational purposes only. It does not diagnose, treat, or replace clinical judgment. Always consult a qualified healthcare professional.
+</div>
+
+<div class="main">
+  <!-- Input Panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="dot"></div> Patient Case Input
+    </div>
+    <textarea id="caseInput" placeholder="Describe the patient's presentation in plain language. Include:
+
+• Chief complaint — what is the main difficulty?
+• Symptom history — when did it start, how has it changed?
+• Associated symptoms — anything else they've noticed?
+• Relevant history — age, known conditions, medications
+• Social / lifestyle factors if relevant
+
+Example: 'A 45-year-old male presents with 3 weeks of persistent dry cough, mild fever in the evenings, fatigue, and unintentional weight loss. He is a non-smoker. No recent travel.'"></textarea>
+    <div id="error-msg"></div>
+    <div class="action-row">
+      <button class="btn" id="generateBtn" onclick="generateReport()">Generate Report</button>
+    </div>
+  </div>
+
+  <!-- Report Panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="dot" style="background:var(--success)"></div> Clinical Reasoning Report
+    </div>
+    <div class="report" id="reportArea">
+      <div class="report-placeholder" id="placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span>Enter a patient case and click <strong>Generate Report</strong></span>
+      </div>
+      <div id="reportContent" style="display:none"></div>
+    </div>
+    <div class="report-footer" id="reportFooter" style="display:none">
+      <button class="btn-sm" onclick="copyReport()">Copy Report</button>
+      <button class="btn-sm" onclick="clearAll()">Clear</button>
+    </div>
+  </div>
+</div>
+
+<script>
+async function generateReport() {
+  const caseText = document.getElementById('caseInput').value.trim();
+  const errEl = document.getElementById('error-msg');
+  errEl.style.display = 'none';
+
+  if (!caseText) {
+    showError('Please enter a patient case description.');
+    return;
+  }
+
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('reportContent').style.display = 'none';
+  document.getElementById('reportFooter').style.display = 'none';
+
+  const reportArea = document.getElementById('reportArea');
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'loading-wrap';
+  loadingDiv.id = 'loadingDiv';
+  loadingDiv.innerHTML = `
+    <div class="loading-bar"></div>
+    <span style="font-family:sans-serif;font-size:0.85rem;color:var(--muted)">Analysing case...</span>
+  `;
+  reportArea.appendChild(loadingDiv);
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ caseText })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || `Server error ${res.status}`);
+    }
+
+    renderReport(data);
+  } catch (e) {
+    showError('Error: ' + e.message);
+    document.getElementById('placeholder').style.display = 'flex';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Generate Report';
+    const ld = document.getElementById('loadingDiv');
+    if (ld) ld.remove();
+  }
+}
+
+function renderReport(r) {
+  document.getElementById('placeholder').style.display = 'none';
+  const el = document.getElementById('reportContent');
+  el.style.display = 'block';
+
+  const tags = (arr, cls) => arr && arr.length
+    ? `<div class="tag-row">${arr.map(s => `<span class="tag ${cls}">${s}</span>`).join('')}</div>`
+    : '<em style="color:var(--muted);font-size:0.82rem;font-family:sans-serif">None noted</em>';
+
+  const structRow = (label, val) => val
+    ? `<div class="struct-row"><span class="struct-label">${label}</span><span class="struct-val">${val}</span></div>`
+    : '';
+
+  el.innerHTML = `
+    <div class="section-title">Summary</div>
+    <p class="report-text">${r.summary || ''}</p>
+
+    <div class="section-title">Core Details</div>
+    <div class="struct">
+      ${structRow('Chief complaint', r.chief_complaint)}
+      ${structRow('Timeline', r.symptom_timeline)}
+      ${structRow('Relevant history', r.relevant_history)}
+    </div>
+
+    <div class="section-title">Key Symptoms</div>
+    ${tags(r.key_symptoms, 'tag-symptom')}
+
+    <div class="section-title">Red Flags</div>
+    ${tags(r.red_flags, 'tag-flag')}
+
+    <div class="section-title">Positive / Negative Findings</div>
+    <div style="margin-bottom:0.3rem">
+      <span style="font-family:sans-serif;font-size:0.75rem;color:var(--muted)">POSITIVE</span>
+    </div>
+    ${tags(r.positive_findings, 'tag-pos')}
+    <div style="margin:0.4rem 0 0.3rem">
+      <span style="font-family:sans-serif;font-size:0.75rem;color:var(--muted)">NEGATIVE</span>
+    </div>
+    ${tags(r.negative_findings, 'tag-symptom')}
+
+    <div class="section-title">Possible Condition Categories</div>
+    ${(r.condition_categories || []).map(c => `
+      <div style="margin-bottom:0.6rem">
+        <span class="tag tag-category">${c.category}</span>
+        <p style="font-size:0.83rem;color:var(--muted);margin-top:0.3rem;font-family:sans-serif;line-height:1.5">${c.rationale}</p>
+      </div>`).join('')}
+
+    <div class="section-title">Suggested Workup Categories</div>
+    ${tags(r.suggested_workup, 'tag-pos')}
+
+    <div class="section-title">Clinical Narrative</div>
+    <p class="report-text">${r.clinical_narrative || ''}</p>
+  `;
+
+  document.getElementById('reportFooter').style.display = 'flex';
+  window._lastReport = r;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('placeholder').style.display = 'flex';
+}
+
+function copyReport() {
+  const r = window._lastReport;
+  if (!r) return;
+  const txt = [
+    'CLINICAL REASONING REPORT', '='.repeat(40), '',
+    'SUMMARY', r.summary, '',
+    'CHIEF COMPLAINT', r.chief_complaint, '',
+    'KEY SYMPTOMS', (r.key_symptoms || []).join(', '), '',
+    'TIMELINE', r.symptom_timeline, '',
+    'RELEVANT HISTORY', r.relevant_history, '',
+    'RED FLAGS', (r.red_flags || []).join(', ') || 'None', '',
+    'POSITIVE FINDINGS', (r.positive_findings || []).join(', '), '',
+    'NEGATIVE FINDINGS', (r.negative_findings || []).join(', '), '',
+    'CONDITION CATEGORIES',
+    ...(r.condition_categories || []).map(c => `• ${c.category}: ${c.rationale}`), '',
+    'SUGGESTED WORKUP', (r.suggested_workup || []).join(', '), '',
+    'CLINICAL NARRATIVE', r.clinical_narrative, '',
+    '— Generated by Clinical Case Builder (educational tool, not a diagnostic instrument)'
+  ].join('\n');
+
+  navigator.clipboard.writeText(txt).then(() => {
+    const btns = document.querySelectorAll('.btn-sm');
+    const copyBtn = btns[0];
+    copyBtn.textContent = 'Copied!';
+    setTimeout(() => copyBtn.textContent = 'Copy Report', 1800);
+  });
+}
+
+function clearAll() {
+  document.getElementById('caseInput').value = '';
+  document.getElementById('reportContent').style.display = 'none';
+  document.getElementById('reportFooter').style.display = 'none';
+  document.getElementById('error-msg').style.display = 'none';
+  const ld = document.getElementById('loadingDiv');
+  if (ld) ld.remove();
+  document.getElementById('placeholder').style.display = 'flex';
+  window._lastReport = null;
+}
+</script>
+</body>
+</html>
